@@ -35,7 +35,7 @@ class Captcha(ImageMixin):
         self.bg_color = bg_color
         self.fg_color = fg_color
         self.font_size = font_size
-        self.font = font if font else path.dirname(__file__) + '/fonts/TimesNewRomanBold.ttf'
+        self.font = font if font else path.join(path.dirname(__file__), 'fonts/TimesNewRomanBold.ttf')
         self.draw_line = draw_line
         self.n_line = n_line
         self.draw_point = draw_point
@@ -117,5 +117,5 @@ class Captcha(ImageMixin):
 
 
 if __name__ == '__main__':
-    captcha = Captcha(chars='', length=4)
+    captcha = Captcha(chars='', length=4, fg_color='#ff0000')
     print b64encode(captcha.make())
