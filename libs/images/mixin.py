@@ -25,7 +25,7 @@ class ImageMixin(object):
         return char
 
     def rand_rgb(self):
-        return self.hex_to_rgb(self.rand_hex())
+        return 'rgb%s' % str(self.hex_to_rgb(self.rand_hex()))
 
     @staticmethod
     def hex_to_rgb(hex_str):
@@ -46,9 +46,11 @@ class ImageMixin(object):
         return self._level
 
     @level.setter
-    def level(self):
-        if level > 15 or level < 0:
+    def level(self, value):
+        if value > 15 or value < 0:
             raise ValueError('color level in [0, 15]')
+
+        self._level = value
 
 class ArgumentError(Exception):
     pass
