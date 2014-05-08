@@ -5,6 +5,8 @@ import random
 
 from mixin import ImageMixin
 from base64 import b64encode
+from StringIO import StringIO
+from os import path
 
 
 class Captcha(ImageMixin):
@@ -33,7 +35,7 @@ class Captcha(ImageMixin):
         self.bg_color = bg_color
         self.fg_color = fg_color
         self.font_size = font_size
-        self.font = font if font else 'fonts/TimesNewRomanBold.ttf'
+        self.font = font if font else path.dirname(__file__) + '/fonts/TimesNewRomanBold.ttf'
         self.draw_line = draw_line
         self.n_line = n_line
         self.draw_point = draw_point
@@ -60,7 +62,12 @@ class Captcha(ImageMixin):
         self._create_strs()
         self._create_transform()
 
-        return self.image.convert("RGBA").tostring("raw", "RGBA")
+        output = StringIO()
+        self.image.save(output, self.image_ext)
+        contents = output.getvalue()
+        output.close()
+
+        return contents
 
     def _create_lines(self):
         if not self.draw_line:
@@ -111,4 +118,4 @@ class Captcha(ImageMixin):
 
 if __name__ == '__main__':
     captcha = Captcha(chars='', length=4)
-    captcha.make()
+    print b64encode(captcha.make())
