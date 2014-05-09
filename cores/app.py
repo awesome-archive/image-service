@@ -4,6 +4,7 @@ from bottle import Bottle, run as _run, cached_property, JSONPlugin, HTTPRespons
 from bottle import LocalResponse as _LocalResponse
 from bottle import LocalRequest as _LocalRequest
 from json import dumps, JSONEncoder
+from functools import wraps
 import pymongo
 import bson
 
@@ -40,8 +41,16 @@ def mongo_dumps(obj):
         return unicode(obj)
     return json.JSONEncoder.default(self, obj)
 
+def strip_path_middleware(wsgi):
+    @wraps(wsgi)
+    def _(environ, start_response):
+        environ['PATH_INFO'] = environ['PATH_INFO'].rstrip('/')
+        return wsgi(environ, start_response)
+    return _
+
 
 app = App()
+app.wsgi = strip_path_middleware(app.wsgi)
 response = LocalResponse()
 request = LocalRequest()
 
