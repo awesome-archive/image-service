@@ -34,7 +34,7 @@ class _object(object):
             attr = getattr(self, val)
 
             if not callable(attr):
-                self.__dict__[val] = kwargs.get(val, None)
+                self.__dict__[val] = kwargs.get(val, attr)
 
     def jsonencode(self):
         _dict = self.to_dict()
@@ -60,3 +60,4 @@ class CaptchaObject(_object):
     uuid = ''
     stream = ''
     create_time = ''
+    used = False

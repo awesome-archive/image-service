@@ -9,7 +9,11 @@ class Base(object):
         self.image = None
         self.image_ext = 'PNG'
 
-    def show(self):
+    def bytes(self):
+        self.make()
+        return self.image.tostring()
+
+    def stream(self):
         self.make()
         content = None
         if self.image is not None:
@@ -20,8 +24,8 @@ class Base(object):
 
         return content
 
-    def show_base64(self):
-        output = self.show()
+    def base64(self):
+        output = self.stream()
         if output is not None:
             return b64encode(output)
 

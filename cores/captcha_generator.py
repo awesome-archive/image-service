@@ -39,7 +39,7 @@ class CaptchaGenerator(MongoMixin):
     def generat_captcha(self, char_lenght=4):
         captcha = Captcha(length=char_lenght)
         text = captcha.chars
-        content = captcha.show_base64()
+        content = captcha.base64()
 
         return text, content
 
