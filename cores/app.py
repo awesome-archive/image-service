@@ -4,26 +4,12 @@ from bottle import Bottle, run as _run, cached_property
 from bottle import LocalResponse as _LocalResponse
 from bottle import LocalRequest as _LocalRequest
 
-from pymongo import MongoClient
 
 from .constants import Constants
+from utils.mixins import MongoMixin
 
-class App(Bottle):
-
-    @cached_property
-    def db(self):
-        connection = MongoClient()
-
-        db = None
-        if connection:
-            db = connection[Constants.MONGO_DATABASE]
-
-        return db
-
-    @cached_property
-    def captcha_coll(self):
-        if self.db is not None:
-            return db[Constants.MONGO_CAPTCHA_COLL]
+class App(Bottle, MongoMixin):
+    pass
 
 class LocalRequest(_LocalRequest):
     pass

@@ -5,6 +5,6 @@ from .constants import Constants
 
 @app.get(r'/captcha/token')
 def token():
-    app.db[Constants.MONGO_DATABASE].insert({'nihao': 'nihao'})
-    count = app.db[Constants.MONGO_DATABASE].count()
+    app.captcha_coll.insert({'nihao': 'buhao'})
+    count = app.captcha_coll.count()
     return str(count)
