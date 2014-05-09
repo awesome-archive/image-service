@@ -1,13 +1,15 @@
 # coding: utf-8
 
-from bottle import Bottle, run as _run
+from bottle import Bottle, run as _run, cached_property
 from bottle import LocalResponse as _LocalResponse
 from bottle import LocalRequest as _LocalRequest
 
+from pymongo import MongoClient
 
 class App(Bottle):
-    pass
-
+    @cached_property
+    def db(self):
+        return MongoClient()
 
 class LocalRequest(_LocalRequest):
     pass
