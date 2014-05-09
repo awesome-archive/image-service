@@ -57,6 +57,10 @@ request = LocalRequest()
 app.autojson = False
 app.install(JSONPlugin(json_dumps=lambda s: dumps(s, default=mongo_dumps)))
 
+@app.hook('after_request')
+def update_image_status():
+    pass
+
 
 def run(host='127.0.0.1', port='5002', debug=False):
     _run(app, host=host, port=port, debug=debug)
