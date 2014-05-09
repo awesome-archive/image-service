@@ -15,7 +15,7 @@ class CaptchaGenerator(MongoMixin):
         self.min_count = min_count
 
         self.check_captcha_thread = CheckCaptchaCountThread(
-            self.condition, self.captcha_coll, self.min_count,
+            self.condition, self.captcha_coll_available_count, self.min_count,
             check_interval
         )
         self.check_captcha_thread.setDaemon(True)
@@ -26,12 +26,13 @@ class CaptchaGenerator(MongoMixin):
 
         while 1:
             self.condition.wait()  # 开始等待查询线程通知
-            curr_count = self.captcha_coll.count()
+            curr_count = self.captcha_coll_available_count()
             new_captcha_count = self.min_count - curr_count
             for _ in xrange(new_captcha_count):  # 开始循环创建验证码
                 text, captcha_str = self.generat_captcha()
                 self.save(text, captcha_str)
-                time.sleep(0.5)
+                # print '创建验证码' + str(text)
+                time.sleep(0.1)  # free cpu average 25%
 
             # 验证码创建完毕之后通知查询线程继续查询
             self.condition.notify()
@@ -57,9 +58,9 @@ class CaptchaGenerator(MongoMixin):
 
 
 class CheckCaptchaCountThread(Thread):
-    def __init__(self, condition, coll, min_count=100, check_interval=10):
+    def __init__(self, condition, coll_count_method, min_count=100, check_interval=10):
         Thread.__init__(self)
-        self.coll = coll
+        self.coll_count_method = coll_count_method
         self.condition = condition
         self.min_count = min_count
         self.check_interval = check_interval
@@ -68,10 +69,10 @@ class CheckCaptchaCountThread(Thread):
         self.condition.acquire()  # 取得锁
 
         while 1:
-            curr_count = self.coll.count()
+            curr_count = self.coll_count_method()
             if curr_count < self.min_count:
                 self.condition.notify()
 
-                self.condition.wait()  # 线程挂起等闲创建验证码主线程通知
+                self.condition.wait()  # 线程挂起等创建验证码主线程通知
 
             time.sleep(self.check_interval)

@@ -21,3 +21,7 @@ class MongoMixin(object):
     def captcha_coll(self):
         if self.db is not None:
             return self.db[Constants.MONGO_CAPTCHA_COLL]
+
+    def captcha_coll_available_count(self):
+        if self.db is not None:
+            return self.captcha_coll.find({'used': False}).count()

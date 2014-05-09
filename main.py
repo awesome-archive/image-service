@@ -5,4 +5,4 @@ from cores.captcha_generator import CaptchaGenerator
 
 # run(debug=True)
 
-CaptchaGenerator().workloop()
+CaptchaGenerator(min_count=100).workloop()

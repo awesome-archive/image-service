@@ -20,7 +20,9 @@ class ImageMixin(object):
         _HEX_CHAR_ARR = map(lambda _str: str(_str)[-1].upper(), [hex(i) for i in xrange(16)])
 
         for position in xrange(6):
-            char += _HEX_CHAR_ARR[randint(self.level, 15)]
+            char += _HEX_CHAR_ARR[randint(
+                abs(self.level) if self.level > 0 else 0, abs(self.level) if self.level < 0 else 15
+            )]
 
         return char
 
@@ -47,7 +49,7 @@ class ImageMixin(object):
 
     @level.setter
     def level(self, value):
-        if value > 15 or value < 0:
+        if (not (-15 <= value <= 15)) and value != 0:
             raise ValueError('color level in [0, 15]')
 
         self._level = value
