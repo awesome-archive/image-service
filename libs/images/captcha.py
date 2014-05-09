@@ -63,13 +63,6 @@ class Captcha(Base, ImageMixin):
         self._create_strs()
         self._create_transform()
 
-        output = StringIO()
-        self.image.save(output, self.image_ext)
-        contents = output.getvalue()
-        output.close()
-
-        return contents
-
     def _create_lines(self):
         if not self.draw_line:
             return

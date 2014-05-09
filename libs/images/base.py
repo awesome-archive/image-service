@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from StringIO import StringIO
-from base64 import b64_encode
+from base64 import b64encode
 
 
 class Base(object):
@@ -10,21 +10,23 @@ class Base(object):
         self.image_ext = 'PNG'
 
     def show(self):
-        output = None
+        self.make()
+        content = None
         if self.image is not None:
             output = StringIO()
             self.image.save(output, self.image_ext)
             content = output.getvalue()
             output.close()
 
-        return output
+        return content
 
     def show_base64(self):
         output = self.show()
         if output is not None:
-            return b64_encode(output)
+            return b64encode(output)
 
     def save(self, filename):
+        self.make()
         if self.image is not None:
             self.image.save(filename, self.image_ext)
 
