@@ -18,14 +18,14 @@ class ImageMixin(object):
     def rand_hex(self):
         char = '#'
         _HEX_CHAR_ARR = map(lambda _str: str(_str)[-1].upper(), [hex(i) for i in xrange(16)])
-        
+
         for position in xrange(6):
             char += _HEX_CHAR_ARR[randint(self.level, 15)]
 
         return char
 
     def rand_rgb(self):
-        return 'rgb%s' % str(self.hex_to_rgb(self.rand_hex()))
+        return self.hex_to_rgb(self.rand_hex())
 
     @staticmethod
     def hex_to_rgb(hex_str):

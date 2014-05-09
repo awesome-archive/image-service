@@ -2,14 +2,15 @@
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import random
-
-from mixin import ImageMixin
 from base64 import b64encode
 from StringIO import StringIO
 from os import path
 
+from mixin import ImageMixin
+from .base import Base
 
-class Captcha(ImageMixin):
+
+class Captcha(Base, ImageMixin):
 
     _letter_chars = 'abcdefghjkmnpqrstuvwxy'
 
@@ -23,6 +24,8 @@ class Captcha(ImageMixin):
                 bg_color=(255, 255, 255), fg_color=(0, 100, 255),
                 font_size=20, font='', length=5, draw_line= True, n_line=5,
                 draw_point=True, point_chance=20):
+
+        super(Captcha, self).__init__()
 
         self.level = 5
 
@@ -40,8 +43,6 @@ class Captcha(ImageMixin):
         self.n_line = n_line
         self.draw_point = draw_point
         self.point_chance = point_chance
-
-        self.image = None
 
     def _makechars(self, chars):
         if not chars:
@@ -99,7 +100,6 @@ class Captcha(ImageMixin):
             ((self.width - font_width) / 3, (self.height - font_height) / 3),
             chars, font=font, fill=self.fg_color
         )
-
 
     def _create_transform(self):
         params = [1 - float(random.randint(1, 2)) / 100,
