@@ -61,3 +61,5 @@ class CaptchaObject(_object):
     stream = ''
     create_time = ''
     used = False
+    random = None
+    extension='png'

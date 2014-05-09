@@ -5,6 +5,7 @@ from utils.mixins import MongoMixin
 from cores.constants import CaptchaObject
 
 from threading import Thread, Condition
+from random import random
 import uuid
 import time
 
@@ -29,8 +30,8 @@ class CaptchaGenerator(MongoMixin):
             curr_count = self.captcha_coll_available_count()
             new_captcha_count = self.min_count - curr_count
             for _ in xrange(new_captcha_count):  # 开始循环创建验证码
-                text, captcha_str = self.generat_captcha()
-                self.save(text, captcha_str)
+                text, image_ext, captcha_str = self.generat_captcha()
+                self.save(text, image_ext, captcha_str)
                 # print '创建验证码' + str(text)
                 time.sleep(0.1)  # free cpu average 25%
 
@@ -42,14 +43,16 @@ class CaptchaGenerator(MongoMixin):
         text = captcha.chars
         content = captcha.base64()
 
-        return text, content
+        return text, captcha.image_ext, content
 
-    def save(self, text, captcha_str):
+    def save(self, text, image_ext, captcha_str):
         _object = CaptchaObject(
             text=text,
             stream=captcha_str,
             create_time=time.time(),
-            uuid=uuid.uuid1().__str__()
+            uuid=uuid.uuid1().__str__(),
+            random=random(),
+            extension=image_ext
         )
 
         # print _object.to_dict()
