@@ -6,10 +6,24 @@ from bottle import LocalRequest as _LocalRequest
 
 from pymongo import MongoClient
 
+from .constants import Constants
+
 class App(Bottle):
+
     @cached_property
     def db(self):
-        return MongoClient()
+        connection = MongoClient()
+
+        db = None
+        if connection:
+            db = connection[Constants.MONGO_DATABASE]
+
+        return db
+
+    @cached_property
+    def captcha_coll(self):
+        if self.db is not None:
+            return db[Constants.MONGO_CAPTCHA_COLL]
 
 class LocalRequest(_LocalRequest):
     pass
