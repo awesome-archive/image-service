@@ -22,6 +22,7 @@ def captcha_token(token=None):
 def captcha():
     coll = app.captcha_coll
     rand = random()
-    content = coll.find_one({'random': {"$gte": rand}, 'used': False})
+    expires = request.params.get('expires')
+    content = coll.find_one({'random': {"$gte": rand}, 'used': False}, expires=expires)
     return content
 

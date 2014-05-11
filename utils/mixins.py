@@ -30,9 +30,12 @@ class MongoMixin(object):
                 @wraps(func)
                 def _(*args, **kwargs):
                     update_used = kwargs.pop('update_used') if 'update_used' in kwargs else True
+                    expires = kwargs.pop('expires') if 'expires' in kwargs\
+                        and str(kwargs['expires']).isdigit else 3600
+
                     result = func(*args, **kwargs)
                     if result is not None and update_used:
-                        coll.update({'_id': result['_id']}, {'$set': {'used': True}})
+                        coll.update({'_id': result['_id']}, {'$set': {'used': True, 'used_time': expires}})
 
                     return result
                 return _
