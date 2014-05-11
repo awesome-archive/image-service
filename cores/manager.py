@@ -5,8 +5,9 @@ from cores.app import app, run as start_http_server
 from libs.process import set_current_proc_title as _set_current_proc_title, ProcessPool
 from libs import process
 from libs.daemon import Daemon
+from cores.constants import Constants
 
-set_current_proc_title = lambda name: _set_current_proc_title(name, 'ImageService')
+set_current_proc_title = lambda name: _set_current_proc_title(name, Constants.PROC_NAME)
 process.base_proc_title = 'python'
 
 from argparse import ArgumentParser
@@ -23,6 +24,7 @@ class Manager(object):
         self.log_path = None
 
         self._init_log_and_pid_file()
+        self._package_check()
 
     def _init_config(self):
         for attr_name in dir(self.namespace):
@@ -32,6 +34,21 @@ class Manager(object):
 
             if not callable(attr):
                 setattr(self, attr_name, attr)
+
+    def _package_check(self):
+        import gevent
+        import gunicorn
+        import PIL
+        import bottle
+        import scgi
+
+    def _init_log_and_pid_file(self):
+        self.log_path = log_path = path.join(self.run_dir, 'logs')
+
+        if not path.isdir(log_path):
+            os.mkdir(log_path)
+
+        self.pidfile = path.join(log_path, 'ImageService.pid')
 
     def loop(self):
         """ 启动应用 """
@@ -44,14 +61,6 @@ class Manager(object):
                 element()
 
         ProcessPool().map(_start_pool_proc, elements)
-
-    def _init_log_and_pid_file(self):
-        self.log_path = log_path = path.join(self.run_dir, 'logs')
-
-        if not path.isdir(log_path):
-            os.mkdir(log_path)
-
-        self.pidfile = path.join(log_path, 'ImageService.pid')
 
     class _MainDaemon(Daemon):
         def __init__(self, manager, *args, **kwargs):

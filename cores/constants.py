@@ -5,6 +5,7 @@ from json import dumps
 class Constants(object):
     MONGO_DATABASE = 'image-service'
     MONGO_CAPTCHA_COLL = 'captcha'
+    PROC_NAME = 'ImageService'
 
     OBJECTS = {}
 

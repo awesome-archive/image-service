@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from bottle import Bottle, run as _run, cached_property, JSONPlugin, HTTPResponse
-from bottle import LocalResponse as _LocalResponse
+from bottle import LocalResponse as _LocalResponse, GunicornServer
 from bottle import LocalRequest as _LocalRequest
 from json import dumps, JSONEncoder
 from functools import wraps
@@ -63,6 +63,9 @@ def update_image_status():
 
 
 def run(host='127.0.0.1', port='5002', debug=False):
-    _run(app, host=host, port=port, debug=debug)
+    _run(app, host=host, port=port, debug=debug, server=GunicornServer,
+         worker_class='gevent',
+         proc_name=Constants.PROC_NAME,
+         workers=4, timeout=20)
 
 

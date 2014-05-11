@@ -53,3 +53,4 @@ docs/_build/
 *.gif
 *.jpeg
 .DS_Store
+logs
