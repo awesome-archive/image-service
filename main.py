@@ -1,8 +1,5 @@
 # coding: utf-8
 
-from cores import run
-from cores.captcha_generator import CaptchaGenerator
+from cores.manager import Manager
 
-run(debug=True)
-
-# CaptchaGenerator(min_count=100).workloop()
+Manager().run()
