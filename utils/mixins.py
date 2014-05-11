@@ -31,7 +31,7 @@ class MongoMixin(object):
                 def _(*args, **kwargs):
                     update_used = kwargs.pop('update_used') if 'update_used' in kwargs else True
                     expires = kwargs.pop('expires') if 'expires' in kwargs\
-                        and kwargs['expires'] is not None
+                        and kwargs['expires'] is not None\
                         and str(kwargs['expires']).isdigit else 3600
 
                     result = func(*args, **kwargs)
