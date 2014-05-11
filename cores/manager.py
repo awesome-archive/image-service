@@ -74,7 +74,7 @@ class Manager(object):
 
         error = path.join(self.log_path, 'error.log')
 
-        daemon = self._MainDaemon(self, self.pidfile, stderr=error, stdout=error)
+        daemon = self._MainDaemon(self, self.pidfile, stderr=error, stdout=os.devnull)
 
         getattr(daemon, operation)()
 
