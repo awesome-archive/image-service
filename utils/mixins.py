@@ -29,8 +29,9 @@ class MongoMixin(object):
                 始终将 used 置为 True"""
                 @wraps(func)
                 def _(*args, **kwargs):
+                    update_used = kwargs.pop('update_used') if 'update_used' in kwargs else True
                     result = func(*args, **kwargs)
-                    if result is not None:
+                    if result is not None and update_used:
                         coll.update({'_id': result['_id']}, {'$set': {'used': True}})
 
                     return result
