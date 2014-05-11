@@ -57,7 +57,7 @@ _object = _Meta('_object', (_object,), {})
 
 class CaptchaObject(_object):
     text = ''
-    _id = ''
+    uuid = ''
     stream = ''
     create_time = 0
     used = False

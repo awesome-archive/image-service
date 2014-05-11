@@ -24,14 +24,17 @@ class MongoMixin(object):
         if self.db is not None:
             coll = self.db[Constants.MONGO_CAPTCHA_COLL]
         if coll is not None:
-            def warps_find_one(func):
+            def wraps_find_one(func):
+                """ 重新封装fine_one, 查找catpcha时,
+                始终将 used 置为 True"""
                 @wraps(func)
                 def _(*args, **kwargs):
                     result = func(*args, **kwargs)
                     if result is not None:
-                        coll.update({'used': True}, result)
+                        coll.update({'_id': result['_id']}, {'$set': {'used': True}})
 
                     return result
+                return _
             coll.find_one = wraps_find_one(coll.find_one)
 
         return coll

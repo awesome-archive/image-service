@@ -38,7 +38,7 @@ class CaptchaGenerator(MongoMixin):
             # 验证码创建完毕之后通知查询线程继续查询
             self.condition.notify()
 
-    def ge_idt_captcha(self, char_lenght=4):
+    def generat_captcha(self, char_lenght=4):
         captcha = Captcha(length=char_lenght)
         text = captcha.chars
         content = captcha.base64()
@@ -50,7 +50,7 @@ class CaptchaGenerator(MongoMixin):
             text=text,
             stream=captcha_str,
             create_time=time.time(),
-            _id=uuid.uuid1().__str__(),
+            uuid=uuid.uuid1().__str__(),
             random=random(),
             extension=image_ext
         )
