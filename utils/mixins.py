@@ -33,6 +33,7 @@ class MongoMixin(object):
                     expires = kwargs.pop('expires') if 'expires' in kwargs\
                         and kwargs['expires'] is not None\
                         and str(kwargs['expires']).isdigit else 3600
+                    expires = time.time() + expires
 
                     result = func(*args, **kwargs)
                     if result is not None and update_used:
