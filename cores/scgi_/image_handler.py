@@ -33,7 +33,7 @@ class ImageHandler(HandlerBase):
             'padding': self.padding,
         }
 
-        #self.debug('product %s request.' % env['SCRIPT_NAME'])
+        # self.debug('product %s request.' % env['SCRIPT_NAME'])
 
         if env['SCRIPT_NAME'] not in handlers:
             raise HandlerException, 'not implement "%s"' % env['SCRIPT_NAME']
@@ -79,7 +79,7 @@ class ImageHandler(HandlerBase):
             library.DrawSetFontSize(drawWand, ctypes.c_double(random.choice(range(fontsize - 5, fontsize + 5))))
 
             library.DrawAnnotation(
-                drawWand, 
+                drawWand,
                 int(sizeX + pos * fontsize / (random.choice([10, 11, 12]) / float(10))),
                 random.choice(range(sizeY, sizeY + 10)) + rorate, text
             )
