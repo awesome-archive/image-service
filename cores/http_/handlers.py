@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from .app import app, response, request, HTTPResponse
-from .constants import Constants
+from ..constants import Constants
 from random import random
 from base64 import b64decode
 

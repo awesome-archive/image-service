@@ -1,16 +1,19 @@
 # coding: utf-8
 
-from cores.captcha_generator import CaptchaGenerator
-from cores.app import app, run as start_http_server
+from cores import CaptchaGenerator
+from cores import start_http_server
+from cores import start_scgi_server
+from cores.constants import Constants
 from libs.process import set_current_proc_title as _set_current_proc_title, ProcessPool
 from libs import process
 from libs.daemon import Daemon
-from cores.constants import Constants
 
 set_current_proc_title = lambda name: _set_current_proc_title(name, Constants.PROC_NAME)
 process.base_proc_title = 'python'
 
 from argparse import ArgumentParser, RawTextHelpFormatter
+from scgi.scgi_server import SCGIServer
+from functools import wraps
 import sys
 import os
 path = os.path
@@ -20,7 +23,14 @@ Commands = ['start', 'stop', 'restart']
 def _define_command(func):
     global Commands
     Commands.append(func.__name__)
-    return func
+    @wraps(func)
+    def _(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except KeyboardInterrupt:
+            sys.stdout.write('Shutdown by <CTL+C>')
+
+    return _
 
 
 class Manager(object):
@@ -48,7 +58,6 @@ class Manager(object):
         import gunicorn
         import PIL
         import bottle
-        import scgi
 
     def _init_log_and_pid_file(self):
         self.log_path = log_path = path.join(self.run_dir, 'logs')
@@ -63,6 +72,9 @@ class Manager(object):
         set_current_proc_title('Master')
 
         elements = [self.run_http_service, self.run_captcha_generat_service]
+
+        if self.with_scgi:
+            elements.append(self.run_scgi_service)
 
         def _start_pool_proc(element):
             if type(element).__name__ == 'instancemethod':
@@ -89,6 +101,8 @@ class Manager(object):
     def run(self):
         operation = self.namespace.operation
 
+        sys.argv = sys.argv[:1]  # 修正gunicore会从argv中获取参数导致错误的问题
+
         if operation.startswith('run_'):
             getattr(self, operation)()
         else:
@@ -97,14 +111,21 @@ class Manager(object):
     @_define_command
     def run_http_service(self):
         """ 开启验证码webApi服务 """
-        set_current_proc_title('Http Service')
+        set_current_proc_title('HttpService')
         start_http_server(self.http_host, self.http_port, self.debug)
 
     @_define_command
     def run_captcha_generat_service(self):
         """ 开启验证码自产进程 """
-        set_current_proc_title('Captcha Generator Service')
-        CaptchaGenerator(self.captch_cache_min_count, self.captch_check_interval).workloop()
+        set_current_proc_title('CaptchaGeneratService')
+        CaptchaGenerator(self.captch_cache_min_count, self.captch_cache_check_interval).workloop()
+
+    @_define_command
+    def run_scgi_service(self):
+        """ 开启scgi图片服务 """
+        set_current_proc_title('ScgiService')
+        start_scgi_server(path.join(sys.path[0], 'libs/images/fonts'), host=self.scgi_host,
+                          port=self.scgi_port, max_children=self.scgi_max_children)
 
     def define_argparser(self):
         parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -117,9 +138,10 @@ class Manager(object):
                             default=False, action='store_true')
         parser.add_argument('--scgi_host', help='scgi服务绑定ip, 默认为127.0.0.1', default='127.0.0.1', action='store')
         parser.add_argument('--scgi_port', help='scgi服务端口号, 默认为4302', default=4302, action='store', type=int)
+        parser.add_argument('--scgi_max_children', help='scgi 默认worker进程数', default=5, action='store', type=int)
         parser.add_argument('--captch_cache_min_count', help='验证码缓存池最小数, 默认为100',
                             action='store', default=100, type=int)
-        parser.add_argument('--captch_check_interval', help='检查验证码缓存池的时间间隔, 默认为10s',
+        parser.add_argument('--captch_cache_check_interval', help='检查验证码缓存池的时间间隔, 默认为10s',
                             default=10, action='store', type=int)
 
         parser.add_argument('operation', help=',\n'.join(Commands), choices=Commands, type=str)

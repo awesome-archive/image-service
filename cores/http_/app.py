@@ -9,7 +9,7 @@ import pymongo
 import bson
 
 
-from .constants import Constants
+from ..constants import Constants
 from utils.mixins import MongoMixin
 
 class App(Bottle, MongoMixin):
