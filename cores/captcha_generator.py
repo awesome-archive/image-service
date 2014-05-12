@@ -5,7 +5,7 @@ from utils.mixins import MongoMixin
 from cores.constants import CaptchaObject
 
 from threading import Thread, Condition, Event
-from random import random
+from random import random, randint
 import uuid
 import time
 
@@ -45,7 +45,9 @@ class CaptchaGenerator(MongoMixin):
             # 验证码创建完毕之后通知查询线程继续查询
             self.condition.notify()
 
-    def generat_captcha(self, char_lenght=4):
+    def generat_captcha(self):
+        char_lenght = randint(4, 5)
+
         captcha = Captcha(length=char_lenght)
         text = captcha.chars
         content = captcha.base64()
@@ -99,7 +101,7 @@ class ClearInvalidCaptcha(Thread):
 
         while 1:
             now_stamptime = time.time()
-            self.captcha_coll.remove({'used': True, 'expires': {'$lte': now_stamptime})
+            self.captcha_coll.remove({'used': True, 'expires': {'$lte': now_stamptime}})
             time.sleep(self.clear_interval)
 
         self.event.set()

@@ -10,10 +10,18 @@ from cores.constants import Constants
 set_current_proc_title = lambda name: _set_current_proc_title(name, Constants.PROC_NAME)
 process.base_proc_title = 'python'
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 import sys
 import os
 path = os.path
+
+Commands = ['start', 'stop', 'restart']
+
+def _define_command(func):
+    global Commands
+    Commands.append(func.__name__)
+    return func
+
 
 class Manager(object):
     def __init__(self):
@@ -54,7 +62,7 @@ class Manager(object):
         """ 启动应用 """
         set_current_proc_title('Master')
 
-        elements = [self.start_http_service, self.start_captcha_generat_service]
+        elements = [self.run_http_service, self.run_captcha_generat_service]
 
         def _start_pool_proc(element):
             if type(element).__name__ == 'instancemethod':
@@ -81,22 +89,27 @@ class Manager(object):
     def run(self):
         operation = self.namespace.operation
 
-        self._operate(operation)
+        if operation.startswith('run_'):
+            getattr(self, operation)()
+        else:
+            self._operate(operation)
 
-    def start_http_service(self):
+    @_define_command
+    def run_http_service(self):
         """ 开启验证码webApi服务 """
         set_current_proc_title('Http Service')
         start_http_server(self.http_host, self.http_port, self.debug)
 
-    def start_captcha_generat_service(self):
+    @_define_command
+    def run_captcha_generat_service(self):
         """ 开启验证码自产进程 """
         set_current_proc_title('Captcha Generator Service')
         CaptchaGenerator(self.captch_cache_min_count, self.captch_check_interval).workloop()
 
     def define_argparser(self):
-        parser = ArgumentParser()
+        parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
         parser.add_argument('-d', '--debug', help='是否调试模式启动', default=False)
-        subparsers = parser.add_subparsers(help='请选择一个操作: ', dest='operation')
+        # subparsers = parser.add_subparsers(help='请选择一个操作: ', dest='operation')
 
         parser.add_argument('--http_host', help='http服务绑定ip, 默认为127.0.0.1', default='127.0.0.1', action='store')
         parser.add_argument('--http_port', help='http服务绑定端口号, 默认为4301', default=4301, action='store', type=int)
@@ -109,8 +122,10 @@ class Manager(object):
         parser.add_argument('--captch_check_interval', help='检查验证码缓存池的时间间隔, 默认为10s',
                             default=10, action='store', type=int)
 
-        subparsers.add_parser('start', help='开启服务')
-        subparsers.add_parser('restart', help='重启服务')
-        subparsers.add_parser('stop', help='关闭服务')
+        parser.add_argument('operation', help=',\n'.join(Commands), choices=Commands, type=str)
+
+        # subparsers.add_parser('start', help='开启服务')
+        # subparsers.add_parser('restart', help='重启服务')
+        # subparsers.add_parser('stop', help='关闭服务')
 
         return parser
