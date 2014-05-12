@@ -38,7 +38,7 @@ class MongoMixin(object):
 
                     result = func(*args, **kwargs)
                     if result is not None and update_used:
-                        coll.update({'_id': result['_id']}, {'$set': {'used': True, 'used_time': expires}})
+                        coll.update({'_id': result['_id']}, {'$set': {'used': True, 'expires': expires}})
 
                     return result
                 return _

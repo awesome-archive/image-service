@@ -4,7 +4,7 @@ from libs.images import Captcha
 from utils.mixins import MongoMixin
 from cores.constants import CaptchaObject
 
-from threading import Thread, Condition
+from threading import Thread, Condition, Event
 from random import random
 import uuid
 import time
@@ -20,6 +20,13 @@ class CaptchaGenerator(MongoMixin):
             check_interval
         )
         self.check_captcha_thread.setDaemon(True)
+
+        self.clear_invalid_captcha_thread = ClearInvalidCaptcha(
+            self.captcha_coll, 30
+        )
+        self.clear_invalid_captcha_thread.setDaemon(True)
+
+        self.clear_invalid_captcha_thread.start()
 
     def workloop(self):
         self.condition.acquire()  # 获得锁
@@ -79,3 +86,20 @@ class CheckCaptchaCountThread(Thread):
                 self.condition.wait()  # 线程挂起等创建验证码主线程通知
 
             time.sleep(self.check_interval)
+
+class ClearInvalidCaptcha(Thread):
+    def __init__(self, captcha_coll, clear_interval=30, *args, **kwargs):
+        Thread.__init__(self, *args, **kwargs)
+        self.captcha_coll = captcha_coll
+        self.clear_interval = clear_interval
+        self.event = Event()
+
+    def run(self):
+        self.event.wait(self.clear_interval)
+
+        while 1:
+            now_stamptime = time.time()
+            self.captcha_coll.remove({'used': True, 'expires': {'$lte': now_stamptime})
+            time.sleep(self.clear_interval)
+
+        self.event.set()
