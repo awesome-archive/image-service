@@ -15,7 +15,7 @@ class _SCGIServer(scgi.scgi_server.SCGIServer):
 
 class _Child:
     def __init__(self, pid, fd):
-        set_current_proc_title('Worker[%s]' % os.getpid(), '%s ScgiService' % Constants.PROC_NAME)
+        set_current_proc_title('Worker[%s]' % os.getpid(), '%s Scgi' % Constants.PROC_NAME)
         self.pid = pid
         self.fd = fd
         self.closed = 0
@@ -28,6 +28,7 @@ class _Child:
 
 scgi.scgi_server.Child = _Child
 
-def run(fonts_path, host, port, max_children=5):
+def run(fonts_path, host, port, max_children=5, detailed_log=False):
     ImageHandler.fonts_path = fonts_path  # 定位字体位置
+    ImageHandler.detailed_log = detailed_log
     _SCGIServer(ImageHandler, host=host, port=port, max_children=max_children).serve()

@@ -28,7 +28,7 @@ def _define_command(func):
         try:
             return func(*args, **kwargs)
         except KeyboardInterrupt:
-            sys.stdout.write('Shutdown by <CTL+C>')
+            sys.stdout.write('Shutdown by <CTL+C>\n')
 
     return _
 
@@ -111,19 +111,19 @@ class Manager(object):
     @_define_command
     def run_http_service(self):
         """ 开启验证码webApi服务 """
-        set_current_proc_title('HttpService')
+        set_current_proc_title('Http')
         start_http_server(self.http_host, self.http_port, self.debug)
 
     @_define_command
     def run_captcha_generat_service(self):
         """ 开启验证码自产进程 """
-        set_current_proc_title('CaptchaGeneratService')
+        set_current_proc_title('CaptchaGenerat')
         CaptchaGenerator(self.captch_cache_min_count, self.captch_cache_check_interval).workloop()
 
     @_define_command
     def run_scgi_service(self):
         """ 开启scgi图片服务 """
-        set_current_proc_title('ScgiService')
+        set_current_proc_title('Scgi')
         start_scgi_server(path.join(sys.path[0], 'libs/images/fonts'), host=self.scgi_host,
                           port=self.scgi_port, max_children=self.scgi_max_children,
                           detailed_log=self.scgi_detailed_log)
