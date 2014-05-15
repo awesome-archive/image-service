@@ -13,7 +13,7 @@ class HandlerException(Exception):
 
 
 class HandlerBase(SCGIHandler):
-    write_log = False
+    detailed_log = False
 
     def __init__(self, *args, **kwargs):
         SCGIHandler.__init__(self, *args, **kwargs)
@@ -30,7 +30,7 @@ class HandlerBase(SCGIHandler):
         env = self.read_env(_input)
         bodysize = int(env.get('CONTENT_LENGTH', 0))
 
-        if self.__class__.write_log:
+        if self.__class__.detailed_log:
             self.debug('request params: %s' % env)
 
         self.output = output

@@ -125,7 +125,8 @@ class Manager(object):
         """ 开启scgi图片服务 """
         set_current_proc_title('ScgiService')
         start_scgi_server(path.join(sys.path[0], 'libs/images/fonts'), host=self.scgi_host,
-                          port=self.scgi_port, max_children=self.scgi_max_children)
+                          port=self.scgi_port, max_children=self.scgi_max_children,
+                          detailed_log=self.scgi_detailed_log)
 
     def define_argparser(self):
         parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -134,13 +135,16 @@ class Manager(object):
 
         parser.add_argument('--http_host', help='http服务绑定ip, 默认为127.0.0.1', default='127.0.0.1', action='store')
         parser.add_argument('--http_port', help='http服务绑定端口号, 默认为4301', default=4301, action='store', type=int)
+
         parser.add_argument('--with_scgi', help='是否自动伴随启动scgi服务, 为现有系统提供支持, 默认关闭',
                             default=False, action='store_true')
         parser.add_argument('--scgi_host', help='scgi服务绑定ip, 默认为127.0.0.1', default='127.0.0.1', action='store')
         parser.add_argument('--scgi_port', help='scgi服务端口号, 默认为4302', default=4302, action='store', type=int)
         parser.add_argument('--scgi_max_children', help='scgi 默认worker进程数', default=5, action='store', type=int)
-        parser.add_argument('--captch_cache_min_count', help='验证码缓存池最小数, 默认为100',
-                            action='store', default=100, type=int)
+        parser.add_argument('--scgi_detailed_log', help='scgi Handler记录详细请求日志', action='store_true')
+
+        parser.add_argument('--captch_cache_min_count', help='验证码缓存池最小数, 默认为10000',
+                            action='store', default=10000, type=int)
         parser.add_argument('--captch_cache_check_interval', help='检查验证码缓存池的时间间隔, 默认为10s',
                             default=10, action='store', type=int)
 
