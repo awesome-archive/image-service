@@ -8,12 +8,13 @@ from functools import wraps
 import pymongo
 import bson
 
-
 from ..constants import Constants
-from utils.mixins import MongoMixin
+from cores.mixins import MongoMixin
+
 
 class App(Bottle, MongoMixin):
     pass
+
 
 class LocalRequest(_LocalRequest):
     pass

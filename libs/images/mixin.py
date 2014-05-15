@@ -13,21 +13,19 @@ LOWERCASE, UPPERCASE = 'x', 'X'
 
 class ImageMixin(object):
 
-    _level = 8
-
-    def rand_hex(self):
+    def rand_hex(self, level):
         char = '#'
         _HEX_CHAR_ARR = map(lambda _str: str(_str)[-1].upper(), [hex(i) for i in xrange(16)])
 
         for position in xrange(6):
             char += _HEX_CHAR_ARR[randint(
-                abs(self.level) if self.level > 0 else 0, abs(self.level) if self.level < 0 else 15
+                abs(level) if level >= 0 else 0, abs(level) if level < 0 else 15
             )]
 
         return char
 
-    def rand_rgb(self):
-        return self.hex_to_rgb(self.rand_hex())
+    def rand_rgb(self, level):
+        return self.hex_to_rgb(self.rand_hex(level))
 
     @staticmethod
     def hex_to_rgb(hex_str):
@@ -43,16 +41,6 @@ class ImageMixin(object):
     def rgb_to_hex(rgb, lettercase=LOWERCASE):
         return format(rgb[0]<<16 | rgb[1]<<8 | rgb[2], '06'+lettercase)
 
-    @property
-    def level(self):
-        return self._level
-
-    @level.setter
-    def level(self, value):
-        if (not (-15 <= value <= 15)) and value != 0:
-            raise ValueError('color level in [0, 15]')
-
-        self._level = value
 
 class ArgumentError(Exception):
     pass

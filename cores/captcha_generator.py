@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from libs.images import Captcha
-from utils.mixins import MongoMixin
+from mixins import MongoMixin
 from cores.constants import CaptchaObject
 
 from threading import Thread, Condition, Event

@@ -2,6 +2,7 @@
 
 from .app import app, response, request, HTTPResponse
 from ..constants import Constants
+from cores.utils import generat_random_captcha
 from random import random
 from base64 import b64decode
 
@@ -24,5 +25,8 @@ def captcha():
     rand = random()
     expires = request.params.get('expires')
     content = coll.find_one({'random': {"$gte": rand}, 'used': False}, expires=expires)
-    return content
 
+    if content:
+        return content
+    else:
+        return generat_random_captcha().to_dict()

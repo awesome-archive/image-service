@@ -2,12 +2,13 @@
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import random
+randint = random.randint
 from base64 import b64encode
 from StringIO import StringIO
 from os import path
 
 from mixin import ImageMixin
-from .base import Base
+from base import Base
 
 
 class Captcha(Base, ImageMixin):
@@ -23,11 +24,9 @@ class Captcha(Base, ImageMixin):
     def __init__(self, size=(100, 30), chars=None, image_ext='PNG', mode='RGB',
                 bg_color=(255, 255, 255), fg_color=(0, 100, 255),
                 font_size=20, font='', length=5, draw_line= True, n_line=5,
-                draw_point=True, point_chance=20):
+                draw_point=True, point_chance=20, transform=True):
 
         super(Captcha, self).__init__()
-
-        self.level = 5
 
         self.size = size
         self.mode = mode
@@ -36,7 +35,7 @@ class Captcha(Base, ImageMixin):
         self.chars = self._makechars(chars)
         self.image_ext = image_ext if image_ext else 'PNG'
         self.bg_color = bg_color
-        self.fg_color = fg_color
+        self.fg_color = self.rand_rgb(-8)
         self.font_size = font_size
 
         # 随机选择字体
@@ -49,6 +48,7 @@ class Captcha(Base, ImageMixin):
         self.n_line = n_line
         self.draw_point = draw_point
         self.point_chance = point_chance
+        self.transform = transform
 
     def _makechars(self, chars):
         if not chars:
@@ -67,16 +67,18 @@ class Captcha(Base, ImageMixin):
         self._create_lines()
         self._create_point()
         self._create_strs()
-        self._create_transform()
+
+        if self.transform:
+            self._create_transform()
 
     def _create_lines(self):
         if not self.draw_line:
             return
 
         for i in range(self.n_line):
-            begin = (random.randint(0, self.width), random.randint(0, self.height))
-            end = (random.randint(0, self.width), random.randint(0, self.height))
-            self.draw.line([begin, end], fill=self.rand_rgb())
+            begin = (randint(0, self.width), randint(0, self.height))
+            end = (randint(0, self.width), randint(0, self.height))
+            self.draw.line([begin, end], fill=self.rand_rgb(8))
 
     def _create_point(self):
         if not self.draw_point:
@@ -86,12 +88,12 @@ class Captcha(Base, ImageMixin):
 
         for w in xrange(self.width):
             for h in xrange(self.height):
-                _ = random.randint(0, 100)
+                _ = randint(0, 100)
                 if _ > 100 - chance:
-                    self.draw.point((w, h), fill=self.rand_rgb())
+                    self.draw.point((w, h), fill=self.rand_rgb(8))
 
     def _create_strs(self):
-        chars = ' %s ' % ' '.join(list(self.chars))
+        chars = ' %s ' % ''.join(list(self.chars))
         font = ImageFont.truetype(self.font, self.font_size)
         font_width, font_height = font.getsize(chars)
 
@@ -101,14 +103,14 @@ class Captcha(Base, ImageMixin):
         )
 
     def _create_transform(self):
-        params = [1 - float(random.randint(1, 2)) / 100,
+        params = [1 - float(randint(1, 2)) / 100,
             0,
             0,
             0,
-            1 - float(random.randint(1, 10)) / 100,
-            float(random.randint(1, 2)) / 500,
+            1 - float(randint(1, 10)) / 100,
+            float(randint(1, 2)) / 500,
             0.001,
-            float(random.randint(1, 2)) / 500
+            float(randint(1, 2)) / 500
         ]
 
         self.image = self.image.transform(self.size, Image.PERSPECTIVE, params)
@@ -117,4 +119,6 @@ class Captcha(Base, ImageMixin):
 
 if __name__ == '__main__':
     captcha = Captcha(chars='', length=4, fg_color='#ff0000')
-    print b64encode(captcha.make())
+    captcha.make()
+    print captcha.base64()
+    file('/tmp/xx.png', 'w').write(captcha.stream())
