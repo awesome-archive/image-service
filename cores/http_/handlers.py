@@ -40,6 +40,6 @@ def captcha():
         coll.insert(image_dict)
 
     if '_id' in content:
-        del content
+        del content['_id']
 
     return content
