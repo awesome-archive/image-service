@@ -6,6 +6,7 @@ import urlparse
 import random
 import cStringIO
 import ctypes
+from os import path
 
 from handler_base import HandlerException, HandlerBase
 
@@ -15,6 +16,9 @@ from wand.api import library
 
 
 class ImageHandler(HandlerBase):
+
+    fonts_path = None
+
     def produce(self, env, bodysize, input):
         """处理 scgi 请求"""
         data = urlparse.parse_qs(env['QUERY_STRING'])
@@ -74,7 +78,7 @@ class ImageHandler(HandlerBase):
             library.DrawRotate(drawWand, ctypes.c_double(float(rorate) / rbase))
             library.DrawSetFontSize(drawWand,
                                     ctypes.c_double(random.choice(range(fontsize - rbase / 2, fontsize + rbase))))
-            font = '%s/handlers/fonts/%s' % (sys.path[0], random.choice(fontList))
+            font = path.join(self.fonts_path, random.choice(fontList))
             library.DrawSetFont(drawWand, font)
 
             library.DrawAnnotation(

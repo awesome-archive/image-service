@@ -7,8 +7,8 @@ import time
 
 from cores.constants import Constants
 
-class MongoMixin(object):
 
+class MongoMixin(object):
     @cached_property
     def db(self):
         connection = MongoClient()
@@ -28,11 +28,12 @@ class MongoMixin(object):
             def wraps_find_one(func):
                 """ 重新封装fine_one, 查找captcha时,
                 始终将 used 置为 True"""
+
                 @wraps(func)
                 def _(*args, **kwargs):
                     update_used = kwargs.pop('update_used') if 'update_used' in kwargs else True
-                    expires = kwargs.pop('expires') if 'expires' in kwargs\
-                        and kwargs['expires'] is not None\
+                    expires = kwargs.pop('expires') if 'expires' in kwargs \
+                                                           and kwargs['expires'] is not None \
                         and str(kwargs['expires']).isdigit else 3600
                     expires = time.time() + float(expires)
 
@@ -41,7 +42,9 @@ class MongoMixin(object):
                         coll.update({'_id': result['_id']}, {'$set': {'used': True, 'expires': expires}})
 
                     return result
+
                 return _
+
             coll.find_one = wraps_find_one(coll.find_one)
 
         return coll

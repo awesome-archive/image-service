@@ -16,13 +16,16 @@ from scgi.scgi_server import SCGIServer
 from functools import wraps
 import sys
 import os
+
 path = os.path
 
 Commands = ['start', 'stop', 'restart']
 
+
 def _define_command(func):
     global Commands
     Commands.append(func.__name__)
+
     @wraps(func)
     def _(*args, **kwargs):
         try:
@@ -117,7 +120,7 @@ class Manager(object):
     @_define_command
     def run_captcha_generat_service(self):
         """ 开启验证码自产进程 """
-        set_current_proc_title('CaptchaGenerat')
+        set_current_proc_title('CaptchaGenerate')
         CaptchaGenerator(self.captcha_cache_min_count, self.captcha_cache_check_interval).workloop()
 
     @_define_command
