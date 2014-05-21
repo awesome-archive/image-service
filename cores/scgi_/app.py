@@ -9,9 +9,8 @@ from ..constants import Constants
 
 
 class _SCGIServer(scgi.scgi_server.SCGIServer):
-    def __init__(self, fonts_path, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         scgi.scgi_server.SCGIServer.__init__(self, *args, **kwargs)
-        self.fonts_path = fonts_path
 
 
 class _Child:
