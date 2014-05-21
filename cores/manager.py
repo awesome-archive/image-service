@@ -118,7 +118,7 @@ class Manager(object):
     def run_captcha_generat_service(self):
         """ 开启验证码自产进程 """
         set_current_proc_title('CaptchaGenerat')
-        CaptchaGenerator(self.captch_cache_min_count, self.captch_cache_check_interval).workloop()
+        CaptchaGenerator(self.captcha_cache_min_count, self.captcha_cache_check_interval).workloop()
 
     @_define_command
     def run_scgi_service(self):
@@ -143,9 +143,9 @@ class Manager(object):
         parser.add_argument('--scgi_max_children', help='scgi 默认worker进程数', default=5, action='store', type=int)
         parser.add_argument('--scgi_detailed_log', help='scgi Handler记录详细请求日志', action='store_true')
 
-        parser.add_argument('--captch_cache_min_count', help='验证码缓存池最小数, 默认为10000',
+        parser.add_argument('--captcha_cache_min_count', help='验证码缓存池最小数, 默认为10000',
                             action='store', default=10000, type=int)
-        parser.add_argument('--captch_cache_check_interval', help='检查验证码缓存池的时间间隔, 默认为10s',
+        parser.add_argument('--captcha_cache_check_interval', help='检查验证码缓存池的时间间隔, 默认为10s',
                             default=10, action='store', type=int)
 
         parser.add_argument('operation', help=',\n'.join(Commands), choices=Commands, type=str)

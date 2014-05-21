@@ -54,3 +54,4 @@ docs/_build/
 *.jpeg
 .DS_Store
 logs
+.idea

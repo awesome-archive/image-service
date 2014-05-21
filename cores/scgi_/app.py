@@ -13,6 +13,7 @@ class _SCGIServer(scgi.scgi_server.SCGIServer):
         scgi.scgi_server.SCGIServer.__init__(self, *args, **kwargs)
         self.fonts_path = fonts_path
 
+
 class _Child:
     def __init__(self, pid, fd):
         set_current_proc_title('Worker[%s]' % os.getpid(), '%s Scgi' % Constants.PROC_NAME)
@@ -27,6 +28,7 @@ class _Child:
 
 
 scgi.scgi_server.Child = _Child
+
 
 def run(fonts_path, host, port, max_children=5, detailed_log=False):
     ImageHandler.fonts_path = fonts_path  # 定位字体位置

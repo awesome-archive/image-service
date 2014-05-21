@@ -8,10 +8,10 @@ from libs.images.captcha import Captcha
 from cores.constants import CaptchaObject
 
 
-def generat_random_captcha():
-    char_lenght = randint(4, 5)
+def generate_random_captcha():
+    char_length = randint(4, 5)
 
-    captcha = Captcha(length=char_lenght)
+    captcha = Captcha(length=char_length)
     text = captcha.chars
     captcha_str = captcha.base64()
     image_ext = captcha.image_ext

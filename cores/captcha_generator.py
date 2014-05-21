@@ -37,7 +37,7 @@ class CaptchaGenerator(MongoMixin):
             curr_count = self.captcha_coll_available_count()
             new_captcha_count = self.min_count - curr_count
             for _ in xrange(new_captcha_count):  # 开始循环创建验证码
-                text, image_ext, captcha_str = self.generat_captcha()
+                text, image_ext, captcha_str = self.generate_captcha()
                 self.save(text, image_ext, captcha_str)
                 # print '创建验证码' + str(text)
                 time.sleep(0.1)  # free cpu average 25%
@@ -45,10 +45,11 @@ class CaptchaGenerator(MongoMixin):
             # 验证码创建完毕之后通知查询线程继续查询
             self.condition.notify()
 
-    def generat_captcha(self):
-        char_lenght = randint(4, 5)
+    @staticmethod
+    def generate_captcha():
+        char_length = randint(4, 5)
 
-        captcha = Captcha(length=char_lenght)
+        captcha = Captcha(length=char_length)
         text = captcha.chars
         content = captcha.base64()
 
@@ -88,6 +89,7 @@ class CheckCaptchaCountThread(Thread):
                 self.condition.wait()  # 线程挂起等创建验证码主线程通知
 
             time.sleep(self.check_interval)
+
 
 class ClearInvalidCaptcha(Thread):
     def __init__(self, captcha_coll, clear_interval=30, *args, **kwargs):

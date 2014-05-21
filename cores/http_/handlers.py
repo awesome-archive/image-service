@@ -2,7 +2,7 @@
 
 from .app import app, response, request, HTTPResponse
 from ..constants import Constants
-from cores.utils import generat_random_captcha
+from cores.utils import generate_random_captcha
 
 from random import random
 from base64 import b64decode
@@ -32,7 +32,7 @@ def captcha():
     content = coll.find_one({'random': {"$gte": rand}, 'used': False}, expires=expires)
 
     if not content:
-        image_dict = generat_random_captcha().to_dict()
+        image_dict = generate_random_captcha().to_dict()
         content = deepcopy(image_dict)
 
         image_dict['used'] = True

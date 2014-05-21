@@ -26,7 +26,7 @@ class MongoMixin(object):
             coll = self.db[Constants.MONGO_CAPTCHA_COLL]
         if coll is not None:
             def wraps_find_one(func):
-                """ 重新封装fine_one, 查找catpcha时,
+                """ 重新封装fine_one, 查找captcha时,
                 始终将 used 置为 True"""
                 @wraps(func)
                 def _(*args, **kwargs):
