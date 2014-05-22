@@ -2,9 +2,13 @@
 
 from StringIO import StringIO
 from base64 import b64encode
+from abc import ABCMeta, abstractmethod
 
 
 class Base(object):
+
+    __metaclass__ = ABCMeta
+
     def __init__(self):
         self.image = None
         self.image_ext = 'PNG'
@@ -33,4 +37,8 @@ class Base(object):
         self.make()
         if self.image is not None:
             self.image.save(filename, self.image_ext)
+
+    @abstractmethod
+    def make(self):
+        pass
 

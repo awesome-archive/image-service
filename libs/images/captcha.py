@@ -2,6 +2,7 @@
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import random
+
 randint = random.randint
 from base64 import b64encode
 from StringIO import StringIO
@@ -12,7 +13,6 @@ from base import Base
 
 
 class Captcha(Base, ImageMixin):
-
     _letter_chars = 'abcdefghjkmnpqrstuvwxy'
 
     _upper_chars = _letter_chars.upper()
@@ -22,9 +22,9 @@ class Captcha(Base, ImageMixin):
     _CHARS = ''.join([_letter_chars, _upper_chars, _numbers])
 
     def __init__(self, size=(100, 30), chars=None, image_ext='PNG', mode='RGB',
-                bg_color=(255, 255, 255), fg_color=(0, 100, 255),
-                font_size=20, font='', length=5, draw_line= True, n_line=5,
-                draw_point=True, point_chance=20, transform=True):
+                 bg_color=(255, 255, 255), fg_color=None,
+                 font_size=20, font='', length=5, draw_line=True, n_line=5,
+                 draw_point=True, point_chance=20, transform=True):
 
         super(Captcha, self).__init__()
 
@@ -35,7 +35,7 @@ class Captcha(Base, ImageMixin):
         self.chars = self._makechars(chars)
         self.image_ext = image_ext if image_ext else 'PNG'
         self.bg_color = bg_color
-        self.fg_color = self.rand_rgb(-8)
+        self.fg_color = fg_color if fg_color is not None else self.rand_rgb(-8)
         self.font_size = font_size
 
         # 随机选择字体
@@ -49,6 +49,8 @@ class Captcha(Base, ImageMixin):
         self.draw_point = draw_point
         self.point_chance = point_chance
         self.transform = transform
+
+        self.draw = None
 
     def _makechars(self, chars):
         if not chars:
@@ -104,14 +106,13 @@ class Captcha(Base, ImageMixin):
 
     def _create_transform(self):
         params = [1 - float(randint(1, 2)) / 100,
-            0,
-            0,
-            0,
-            1 - float(randint(1, 10)) / 100,
-            float(randint(1, 2)) / 500,
-            0.001,
-            float(randint(1, 2)) / 500
-        ]
+                  0,
+                  0,
+                  0,
+                  1 - float(randint(1, 10)) / 100,
+                  float(randint(1, 2)) / 500,
+                  0.001,
+                  float(randint(1, 2)) / 500]
 
         self.image = self.image.transform(self.size, Image.PERSPECTIVE, params)
         self.image = self.image.filter(ImageFilter.EDGE_ENHANCE_MORE)

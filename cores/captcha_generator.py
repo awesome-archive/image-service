@@ -102,8 +102,8 @@ class ClearInvalidCaptcha(Thread):
         self.event.wait(self.clear_interval)
 
         while 1:
-            now_stamptime = time.time()
-            self.captcha_coll.remove({'used': True, 'expires': {'$lte': now_stamptime}})
+            now_timestamp = time.time()
+            self.captcha_coll.remove({'used': True, 'expires': {'$lte': now_timestamp}})
             time.sleep(self.clear_interval)
 
         self.event.set()
