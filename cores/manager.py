@@ -12,7 +12,6 @@ set_current_proc_title = lambda name: _set_current_proc_title(name, Constants.PR
 process.base_proc_title = 'python'
 
 from argparse import ArgumentParser, RawTextHelpFormatter
-from scgi.scgi_server import SCGIServer
 from functools import wraps
 import sys
 import os
@@ -44,6 +43,17 @@ class Manager(object):
         self.pidfile = None
         self.log_path = None
 
+        self.with_scgi = None
+        self.http_host = '0.0.0.0'
+        self.http_port = 4231
+        self.debug = False
+        self.captcha_cache_min_count = 10000
+        self.captcha_cache_check_interval = 30
+        self.scgi_host = '0.0.0.0'
+        self.scgi_port = 4230
+        self.scgi_max_children = 5
+        self.scgi_detailed_log = True
+
         self._init_log_and_pid_file()
         self._package_check()
 
@@ -74,7 +84,7 @@ class Manager(object):
         """ 启动应用 """
         set_current_proc_title('Master')
 
-        elements = [self.run_http_service, self.run_captcha_generat_service]
+        elements = [self.run_http_service, self.run_captcha_generate_service]
 
         if self.with_scgi:
             elements.append(self.run_scgi_service)
@@ -118,7 +128,7 @@ class Manager(object):
         start_http_server(self.http_host, self.http_port, self.debug)
 
     @_define_command
-    def run_captcha_generat_service(self):
+    def run_captcha_generate_service(self):
         """ 开启验证码自产进程 """
         set_current_proc_title('CaptchaGenerate')
         CaptchaGenerator(self.captcha_cache_min_count, self.captcha_cache_check_interval).workloop()
@@ -131,10 +141,10 @@ class Manager(object):
                           port=self.scgi_port, max_children=self.scgi_max_children,
                           detailed_log=self.scgi_detailed_log)
 
-    def define_argparser(self):
+    @staticmethod
+    def define_argparser():
         parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
         parser.add_argument('-d', '--debug', help='是否调试模式启动', default=False)
-        # subparsers = parser.add_subparsers(help='请选择一个操作: ', dest='operation')
 
         parser.add_argument('--http_host', help='http服务绑定ip, 默认为127.0.0.1', default='127.0.0.1', action='store')
         parser.add_argument('--http_port', help='http服务绑定端口号, 默认为4301', default=4301, action='store', type=int)
@@ -152,9 +162,5 @@ class Manager(object):
                             default=10, action='store', type=int)
 
         parser.add_argument('operation', help=',\n'.join(Commands), choices=Commands, type=str)
-
-        # subparsers.add_parser('start', help='开启服务')
-        # subparsers.add_parser('restart', help='重启服务')
-        # subparsers.add_parser('stop', help='关闭服务')
 
         return parser
